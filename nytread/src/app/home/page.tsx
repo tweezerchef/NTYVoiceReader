@@ -1,10 +1,7 @@
-"use client";
-import React, { useState } from "react";
-import AigenComp1 from "./components/AigenComp1";
-import AiGenComp2 from "./components/AIGenComp2";
+import { RecordAudio } from "./components/RecordAudio";
 
 const IndexPage = () => {
-  return <AiGenComp2 />;
+  return <RecordAudio />;
 };
 
 export default IndexPage;
