@@ -9,13 +9,13 @@ export const RecordAudio = () => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
 
   const sendAudioToServer = async (audioBlob: Blob) => {
-    const formData = new FormData();
-    formData.append("file", audioBlob, "recording.mp3");
-
     try {
-      const response = await fetch("/api/transcribe", {
+      const response = await fetch("/home/api/speechToText", {
         method: "POST",
-        body: formData,
+        body: audioBlob, // Send audioBlob directly as binary
+        headers: {
+          "Content-Type": "audio/mpeg", // Set the appropriate content type
+        },
       });
 
       if (!response.ok) {
@@ -23,6 +23,7 @@ export const RecordAudio = () => {
       }
 
       const data = await response.json();
+      console.log(data);
       setTranscription(JSON.stringify(data, null, 2));
     } catch (error) {
       console.error("Error sending audio to server:", error);

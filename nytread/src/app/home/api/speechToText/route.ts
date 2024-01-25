@@ -1,59 +1,66 @@
-
-import { NextApiRequest, NextApiResponse } from 'next';
-import formidable from 'formidable';
+// pages/api/speechToText.ts
 import OpenAI from 'openai';
-import fs from 'fs';
-import path from 'path';
+import { Readable } from 'stream';
 
 const openAI = new OpenAI();
+async function streamToBuffer(stream) {
+    const chunks = [];
+    const reader = stream.getReader();
+    let done, value;
 
+    while ({ done, value } = await reader.read()) {
+      if (done) break;
+      chunks.push(value);
+    }
+
+    return new Uint8Array(Buffer.concat(chunks));
+  }
 export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-export async function POST(req: NextApiRequest, res: NextApiResponse){
-    const form = new formidable.IncomingForm();
-
-    form.parse(req, async (err, fields, files) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-
-      // Assuming the file is available under the 'file' key
-      const file = Array.isArray(files.file) ? files.file[0] : files.file;
-      if (!file) {
-        res.status(400).json({ error: 'No file uploaded.' });
-        return;
-      }
-
-      // Save the file temporarily
-      const filePath = path.join('/tmp', file.newFilename);  // Use 'newFilename' for formidable v2
-      const fileStream = fs.createWriteStream(filePath);
-      fs.createReadStream(file.filepath).pipe(fileStream);
-
-      await new Promise<void>((resolve, reject) => {
-        fileStream.on('finish', resolve);
-        fileStream.on('error', reject);
-      });
-
-      try {
-        // Send the file to OpenAI for transcription
-        const transcription = await openAI.audio.transcriptions.create({
-          file: fs.createReadStream(filePath),
-          model: "whisper-1",
-        });
-
-        // Clean up: delete the temporary file
-        fs.unlinkSync(filePath);
-
-        // Respond with the transcription result
-        res.status(200).json(transcription);
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: `OpenAI Error: ${(error as Error).message}` });
-      }
-    });
+    api: {
+      bodyParser: {
+        sizeLimit: '10mb', // Set an appropriate size limit for your audio files
+      },
+    },
   };
+
+export const POST = async (req: Request) => {
+    console.log(req.body, "req.body")
+  try {
+    const { body } = req;
+    const audioFile = body as ReadableStream<Uint8Array>;
+
+    if (!audioFile || typeof audioFile === 'string') {
+      return new Response(JSON.stringify({ error: 'No file uploaded.' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    const audioBlob = new Blob([audioFile], { type: 'audio/mpeg' });
+    const arrayBuffer = await audioBlob.arrayBuffer();
+    const audioData = new Uint8Array(arrayBuffer);
+    const audioStream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(audioData);
+        controller.close();
+      },
+    });
+
+    const transcription = await openAI.audio.transcriptions.create({
+      file: audioStream,
+      model: 'whisper-1',
+    });
+
+
+    // Respond with the transcription result
+    return new Response(JSON.stringify({ transcription }), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    const message = (error as Error).message;
+    console.error(message);
+    return new Response(JSON.stringify({ error: `Error: ${message}` }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+};
