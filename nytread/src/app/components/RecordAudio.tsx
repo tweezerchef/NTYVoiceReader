@@ -1,7 +1,12 @@
 "use client";
-
+import dynamic from "next/dynamic";
 import { useState } from "react";
-import { ReactMediaRecorder } from "react-media-recorder";
+import { ReactMediaRecorderProps } from "react-media-recorder";
+//import { ReactMediaRecorder } from "react-media-recorder";
+const ReactMediaRecorder = dynamic<ReactMediaRecorderProps>(
+  () => import("react-media-recorder").then((mod) => mod.ReactMediaRecorder), // Explicitly access the component
+  { ssr: false }
+);
 
 export const RecordAudio = () => {
   const [recording, setRecording] = useState<string>("");
