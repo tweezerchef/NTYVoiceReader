@@ -8,26 +8,35 @@ export const RecordAudio = () => {
   const [transcription, setTranscription] = useState<string>("");
   const [isRecording, setIsRecording] = useState<boolean>(false);
 
-  const sendAudioToServer = async (audioBlob: Blob) => {
-    try {
-      const response = await fetch("/home/api/speechToText", {
-        method: "POST",
-        body: audioBlob, // Send audioBlob directly as binary
-        headers: {
-          "Content-Type": "audio/mpeg", // Set the appropriate content type
-        },
-      });
+  const handleStopRecording = async (blobUrl: string, blob: Blob) => {
+    setRecording(blobUrl);
 
-      if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
+    // Convert the blob to a base64 string
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = async () => {
+      const base64data = reader.result as string;
+
+      // Send the base64 audio data to the API
+      try {
+        const response = await fetch("/api/transcribe", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ audioBase64: base64data }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setTranscription(data.transcription);
+      } catch (error) {
+        console.error("Error sending audio to server:", error);
       }
-
-      const data = await response.json();
-      console.log(data);
-      setTranscription(JSON.stringify(data, null, 2));
-    } catch (error) {
-      console.error("Error sending audio to server:", error);
-    }
+    };
   };
 
   return (
@@ -36,10 +45,7 @@ export const RecordAudio = () => {
 
       <ReactMediaRecorder
         audio
-        onStop={(blobUrl, blob) => {
-          setRecording(blobUrl);
-          sendAudioToServer(blob);
-        }}
+        onStop={handleStopRecording}
         render={({ status, startRecording, stopRecording }) => (
           <>
             <p>Status: {status}</p>
