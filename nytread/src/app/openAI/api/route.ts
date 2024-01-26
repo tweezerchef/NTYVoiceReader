@@ -2,12 +2,13 @@ import fs from 'fs';
 import path from 'path';
 import { openAIAudioToText } from '../../../../utility/openAIAudioToText';
 
-
 export const POST = async (req: Request) => {
-    const { audioBase64 } = req.body;
+    // Parse the JSON body from the request
+    const body = await req.json();
+    const audioBase64 = body.audioBase64;
 
     // Convert base64 to a buffer
-    const buffer = Buffer.from(audioBase64.split(';base64,').pop(), 'base64');
+    const buffer = Buffer.from(audioBase64.split(';base64,').pop() || '', 'base64');
 
     // Create a temporary file path
     const tempFilePath = path.join('/tmp', `audio-${Date.now()}.mp3`);
@@ -24,12 +25,12 @@ export const POST = async (req: Request) => {
       return new Response(JSON.stringify({ transcription }), {
         headers: { 'Content-Type': 'application/json' }
       });
-    }catch (error) {
+    } catch (error) {
         const message = (error as Error).message;
         console.error(message);
         return new Response(JSON.stringify({ error: `Error: ${message}` }), {
           status: 500,
           headers: { 'Content-Type': 'application/json' }
         });
-      }
-    };
+    }
+};

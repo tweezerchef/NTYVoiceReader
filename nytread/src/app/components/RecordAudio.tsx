@@ -19,7 +19,7 @@ export const RecordAudio = () => {
 
       // Send the base64 audio data to the API
       try {
-        const response = await fetch("/api/transcribe", {
+        const response = await fetch("/openAI/api/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -70,7 +70,9 @@ export const RecordAudio = () => {
 
             <div className="mt-4">
               <h2 className="text-lg font-bold mb-2">Transcription:</h2>
-              <pre className="p-4 bg-gray-200 rounded">{transcription}</pre>
+              <pre className="p-4 bg-gray-200 text-black rounded">
+                {transcription}
+              </pre>
             </div>
           </>
         )}
