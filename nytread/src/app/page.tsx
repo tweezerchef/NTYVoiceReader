@@ -1,32 +1,53 @@
 "use client";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function Home() {
-  const [isFetching, setIsFetching] = useState(false);
-  const [text, setText] = useState(""); // State to store the input text
+  const [audioUrl, setAudioUrl] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const audioRef = useRef<HTMLAudioElement>(null); // Reference to the audio element
 
-  const opening = async () => {
-    setIsFetching(true);
-    try {
-      const response = await fetch("/api/openAI/opening", {
-        method: "POST",
-      });
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+  useEffect(() => {
+    const fetchAudio = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch("/openAI/api/opening");
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        const blob = await response.blob();
+        setAudioUrl(URL.createObjectURL(blob));
+      } catch (error) {
+        console.error("There was an error fetching the audio:", error);
+      } finally {
+        setIsLoading(false);
       }
-      const blob = await response.blob();
-      const audioUrl = URL.createObjectURL(blob);
-      const audio = new Audio(audioUrl);
-      audio.play();
-    } catch (error) {
-      console.error("There was an error fetching the audio:", error);
-    } finally {
-      setIsFetching(false);
+    };
+
+    fetchAudio();
+  }, []);
+
+  // Function to play audio
+  const playAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.play();
     }
   };
+
+  // KeyPress Event Listener
   useEffect(() => {
-    opening();
-  }, []);
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === "Enter") {
+        playAudio();
+      }
+    };
+
+    window.addEventListener("keypress", handleKeyPress);
+
+    // Clean up
+    return () => {
+      window.removeEventListener("keypress", handleKeyPress);
+    };
+  }, [audioUrl]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24 bg-slate-500">
@@ -35,6 +56,11 @@ export default function Home() {
         <p className="text-white text-center">
           A tool to help you read the New York Times.
         </p>
+        {isLoading ? (
+          <div className="spinner">Loading...</div>
+        ) : (
+          <audio ref={audioRef} src={audioUrl} controls />
+        )}
       </div>
     </main>
   );
