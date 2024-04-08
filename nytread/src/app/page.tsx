@@ -29,7 +29,10 @@ export default function Home() {
       <div className="flex flex-col items-center justify-center">
         <h1 className="text-4xl font-bold text-white mb-4">NYT Read</h1>
         <audio src={audioUrl} controls />
-        <RecordAudio isRecording={isRecording} />
+        <RecordAudio
+          isRecording={isRecording}
+          setIsRecording={setIsRecording}
+        />
       </div>
     </main>
   );
