@@ -3,7 +3,12 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 import { ReactMediaRecorderProps } from "react-media-recorder";
 //import { ReactMediaRecorder } from "react-media-recorder";
-const ReactMediaRecorder = dynamic<ReactMediaRecorderProps>(
+interface RecordAudioProps extends ReactMediaRecorderProps {
+  isRecording: boolean;
+  setIsRecording: (isRecording: boolean) => void;
+}
+
+const ReactMediaRecorder = dynamic<RecordAudioProps>(
   () => import("react-media-recorder").then((mod) => mod.ReactMediaRecorder), // Explicitly access the component
   { ssr: false }
 );
