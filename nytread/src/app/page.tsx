@@ -1,53 +1,78 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, use } from "react";
 
 export default function Home() {
-  const [audioUrl, setAudioUrl] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const audioRef = useRef<HTMLAudioElement>(null); // Reference to the audio element
+  const [audioUrl, setAudioUrl] = useState<string>("/NYTOpening.mp3");
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isRecording, setIsRecording] = useState<boolean>(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const [recordedChunks, setRecordedChunks] = useState<Blob[]>([]);
 
   useEffect(() => {
-    const fetchAudio = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch("/openAI/api/opening");
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
-        const blob = await response.blob();
-        setAudioUrl(URL.createObjectURL(blob));
-      } catch (error) {
-        console.error("There was an error fetching the audio:", error);
-      } finally {
-        setIsLoading(false);
+    const playAudioOpen = () => {
+      if (audioRef.current) {
+        audioRef.current.load();
+        audioRef.current.play().catch((error) => {
+          console.error("Error playing audio:", error);
+        });
       }
     };
 
-    fetchAudio();
-  }, []);
-
-  // Function to play audio
-  const playAudio = () => {
-    if (audioRef.current) {
-      audioRef.current.play();
+    if (!isRecording) {
+      playAudioOpen();
     }
-  };
+  }, [audioUrl, isRecording]);
 
-  // KeyPress Event Listener
   useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key === "Enter") {
-        playAudio();
+    const startRecording = async () => {
+      setIsRecording(true);
+      setRecordedChunks([]);
+      if (!navigator.mediaDevices.getUserMedia) {
+        console.error("getUserMedia not supported");
+        return;
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      mediaRecorderRef.current.ondataavailable = (event: BlobEvent) => {
+        if (event.data.size > 0) {
+          setRecordedChunks((prev) => [...prev, event.data]);
+        }
+      };
+      mediaRecorderRef.current.start();
+    };
+    const stopRecording = () => {
+      setIsRecording(false);
+      mediaRecorderRef.current?.stop();
+      // Here, you can handle the recorded audio as needed
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === " ") {
+        event.preventDefault();
+        if (isRecording) {
+          stopRecording();
+        } else {
+          if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+          }
+          startRecording();
+        }
+      } else if (event.key === "p") {
+        event.preventDefault(); // Prevent the default backspace action
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+        }
       }
     };
 
-    window.addEventListener("keypress", handleKeyPress);
-
-    // Clean up
+    window.addEventListener("keypress", handleKeyDown);
     return () => {
-      window.removeEventListener("keypress", handleKeyPress);
+      window.removeEventListener("keypress", handleKeyDown);
     };
-  }, [audioUrl]);
+  }, [isRecording]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24 bg-slate-500">
