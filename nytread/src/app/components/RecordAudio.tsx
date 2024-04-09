@@ -33,7 +33,7 @@ export const RecordAudio = ({
       const base64data = reader.result as string;
 
       try {
-        const response = await fetch("/openAI/api/", {
+        const response = await fetch("/openAI/api/category/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
