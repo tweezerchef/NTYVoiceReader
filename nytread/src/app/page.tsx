@@ -30,6 +30,7 @@ export default function Home() {
         <h1 className="text-4xl font-bold text-white mb-4">NYT Read</h1>
         <audio src={audioUrl} controls />
         <RecordAudio
+          direction="section"
           isRecording={isRecording}
           setIsRecording={setIsRecording}
         />

@@ -5,6 +5,7 @@ import { useState } from "react";
 interface RecordAudioProps {
   isRecording: boolean;
   setIsRecording: (isRecording: boolean) => void;
+  direction: "section" | "article";
 }
 
 // Import ReactMediaRecorder dynamically without extending its props here
