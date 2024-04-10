@@ -1,8 +1,7 @@
-// Home.tsx
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import { RecordAudio } from "./components/RecordAudio";
-export default function Home() {
+import { RecordAudio } from "../components/RecordAudio";
+export default function HomePage() {
   const [audioUrl, setAudioUrl] = useState<string>("/NYTOpening.mp3");
   const [isRecording, setIsRecording] = useState<boolean>(false);
 
