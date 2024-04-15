@@ -35,25 +35,7 @@ export const useSectionData = () => {
   }
   return context;
 };
-// export const useSection = () => {
-//   const context = useContext(SectionContext);
-//   if (!context) {
-//     throw new Error('useSection must be used within a SectionProvider');
-//   }
-//   return context;
-// };
 
-// export const SectionProvider: React.FC<SectionProviderProps> = ({
-//   children,
-// }) => {
-//   const [sectionData, setSectionData] = useState<SectionData | null>(null);
-
-//   return (
-//     <SectionContext.Provider value={{ sectionData, setSectionData }}>
-//       {children}
-//     </SectionContext.Provider>
-//   );
-// };
 export const SectionProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
