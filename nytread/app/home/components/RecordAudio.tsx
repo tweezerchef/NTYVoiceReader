@@ -21,7 +21,7 @@ export const RecordAudio = ({
 }: RecordAudioProps) => {
   const [recording, setRecording] = useState<string>("");
   const [transcription, setTranscription] = useState<string>("");
-  const { sectionData, setSectionData } = useSectionData();
+  const { setArticles } = useSectionData();
   const router = useRouter();
 
   const handleStopRecording = async (blobUrl: string, blob: Blob) => {
@@ -47,7 +47,7 @@ export const RecordAudio = ({
 
         const data = await response.json();
         setTranscription(data.transcription);
-        setSectionData(data);
+        setArticles(data);
         router.push("/section");
       } catch (error) {
         console.error("Error sending audio to server:", error);
