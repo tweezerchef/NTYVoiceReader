@@ -1,11 +1,19 @@
 "use client";
 import dynamic from "next/dynamic";
 import { useState } from "react";
+interface Article {
+  index: number;
+  title: string;
+  abstract: string;
+  byline: string;
+  url: string;
+}
 
 interface RecordAudioProps {
   isRecording: boolean;
   setIsRecording: (isRecording: boolean) => void;
   direction?: "section" | "article";
+  articles: Article[];
 }
 
 // Import ReactMediaRecorder dynamically without extending its props here
@@ -14,16 +22,13 @@ const ReactMediaRecorder = dynamic(
   { ssr: false }
 );
 
-export const RecordAudio = ({
+export const RecordAudioSection = ({
   isRecording,
   setIsRecording,
+  articles,
 }: RecordAudioProps) => {
   const [recording, setRecording] = useState<string>("");
   const [transcription, setTranscription] = useState<string>("");
-  const [startRecording, setStartRecording] = useState<(() => void) | null>(
-    null
-  );
-  const [stopRecording, setStopRecording] = useState<(() => void) | null>(null);
 
   const handleStopRecording = async (blobUrl: string, blob: Blob) => {
     setRecording(blobUrl);
@@ -34,12 +39,12 @@ export const RecordAudio = ({
       const base64data = reader.result as string;
 
       try {
-        const response = await fetch("/openAI/api/category/", {
+        const response = await fetch("/openAI/api/article/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ audioBase64: base64data }),
+          body: JSON.stringify({ audioBase64: base64data, articles }),
         });
 
         if (!response.ok) {
@@ -69,11 +74,10 @@ export const RecordAudio = ({
               onClick={() => {
                 if (isRecording) {
                   stopRecording();
-                  setIsRecording(false);
                 } else {
                   startRecording();
-                  setIsRecording(true);
                 }
+                setIsRecording(!isRecording); // Toggle recording state based on action
               }}
             >
               {isRecording ? "Stop Recording" : "Start Recording"}

@@ -1,10 +1,12 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useSectionData } from "../contexts/SectionContext";
+import { RecordAudioSection } from "./components/RecordAudioSection";
 
 export default function Section() {
-  const { articles } = useSectionData(); // Access your articles data from context
+  const { articles } = useSectionData();
   const [currentAudioIndex, setCurrentAudioIndex] = useState(0);
+  const [isRecording, setIsRecording] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   // Convert Base64 audio data to blob URLs
@@ -14,7 +16,6 @@ export default function Section() {
     )
   );
 
-  // Handle the end of an audio to play the next one
   useEffect(() => {
     const audioElem = audioRef.current;
     if (!audioElem) return;
@@ -38,11 +39,13 @@ export default function Section() {
     const audioElem = audioRef.current;
     if (audioElem && audioUrls[currentAudioIndex]) {
       audioElem.src = audioUrls[currentAudioIndex];
-      audioElem
-        .play()
-        .catch((err) => console.error("Error playing audio:", err));
+      if (!isRecording) {
+        audioElem
+          .play()
+          .catch((err) => console.error("Error playing audio:", err));
+      }
     }
-  }, [currentAudioIndex, audioUrls]);
+  }, [currentAudioIndex, audioUrls, isRecording]);
 
   // // Change the source and play the next audio when index changes
   // useEffect(() => {
@@ -54,6 +57,11 @@ export default function Section() {
   //       .catch((err) => console.error("Error playing audio:", err));
   //   }
   // }, [currentAudioIndex, audioUrls]);
+  useEffect(() => {
+    if (isRecording && audioRef.current) {
+      audioRef.current.pause();
+    }
+  }, [isRecording]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-slate-500">
@@ -61,6 +69,11 @@ export default function Section() {
         NYT Reader: Articles Audio
       </h1>
       <audio ref={audioRef} controls autoPlay />
+      <RecordAudioSection
+        articles={articles}
+        isRecording={isRecording}
+        setIsRecording={setIsRecording}
+      />
     </main>
   );
 }
