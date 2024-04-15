@@ -1,7 +1,8 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useState } from "react";
-import { useRouter } from "next/router";
+import { useState, useEffect, FC } from "react";
+import { useRouter } from "next/navigation";
+import { useSectionData } from "../../contexts/SectionContext";
 
 interface RecordAudioProps {
   isRecording: boolean;
@@ -20,7 +21,9 @@ export const RecordAudio = ({
 }: RecordAudioProps) => {
   const [recording, setRecording] = useState<string>("");
   const [transcription, setTranscription] = useState<string>("");
+  const { sectionData, setSectionData } = useSectionData();
   const router = useRouter();
+
   const handleStopRecording = async (blobUrl: string, blob: Blob) => {
     setRecording(blobUrl);
 
@@ -44,8 +47,7 @@ export const RecordAudio = ({
 
         const data = await response.json();
         setTranscription(data.transcription);
-
-        localStorage.setItem("sectionData", JSON.stringify(data));
+        setSectionData(data);
         router.push("/section");
       } catch (error) {
         console.error("Error sending audio to server:", error);

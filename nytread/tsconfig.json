@@ -27,7 +27,10 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "next.config.js"
+    "next.config.js",
+    "../misc/AigenComp1.tsx",
+    "../misc/AIGenComp2 copy.tsx",
+    "../misc/AIGenComp2.tsx"
   ],
   "exclude": ["node_modules", "*.js", "**/*.js"]
 }

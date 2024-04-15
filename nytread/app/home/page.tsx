@@ -1,6 +1,13 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import { RecordAudio } from "../components/RecordAudio";
+import dynamic from "next/dynamic";
+
+const RecordAudio = dynamic(
+  () => import("./components/RecordAudio").then((mod) => mod.RecordAudio),
+  {
+    ssr: false, // Disable server-side rendering
+  }
+);
 export default function HomePage() {
   const [audioUrl, setAudioUrl] = useState<string>("/NYTOpening.mp3");
   const [isRecording, setIsRecording] = useState<boolean>(false);

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import { RecordAudio } from "../components/RecordAudio";
+import { RecordAudio } from "../home/components/RecordAudio";
 export default function Section() {
   const [audioUrl, setAudioUrl] = useState<string>("");
   const [isRecording, setIsRecording] = useState<boolean>(false);
