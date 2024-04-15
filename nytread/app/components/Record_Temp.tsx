@@ -21,6 +21,7 @@ export const RecordAudio = ({
   const [recording, setRecording] = useState<string>("");
   const [transcription, setTranscription] = useState<string>("");
   const router = useRouter();
+
   const handleStopRecording = async (blobUrl: string, blob: Blob) => {
     setRecording(blobUrl);
 
@@ -30,7 +31,7 @@ export const RecordAudio = ({
       const base64data = reader.result as string;
 
       try {
-        const response = await fetch("/openAI/api/category/", {
+        const response = await fetch("/api/your-api-route", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -45,6 +46,7 @@ export const RecordAudio = ({
         const data = await response.json();
         setTranscription(data.transcription);
 
+        // Store the data and redirect
         localStorage.setItem("sectionData", JSON.stringify(data));
         router.push("/section");
       } catch (error) {
@@ -56,7 +58,6 @@ export const RecordAudio = ({
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Audio Recorder</h1>
-
       <ReactMediaRecorder
         audio
         onStop={handleStopRecording}
@@ -79,7 +80,6 @@ export const RecordAudio = ({
             </button>
 
             {recording && <audio src={recording} controls />}
-
             <div className="mt-4">
               <h2 className="text-lg font-bold mb-2">Transcription:</h2>
               <pre className="p-4 bg-gray-200 text-black rounded">

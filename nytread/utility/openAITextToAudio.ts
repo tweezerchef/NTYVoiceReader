@@ -2,7 +2,7 @@ import OpenAI from "openai";
 
 
 const openai = new OpenAI();
-export const  opening = async (text: string) => {
+export const openAITextToAudio = async (text: string) => {
 
     const response = await openai.audio.speech.create({
         model: "tts-1",

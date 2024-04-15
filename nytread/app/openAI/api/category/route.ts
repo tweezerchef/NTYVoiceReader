@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { openAIAudioToText } from '../../../../utility/openAIAudioToText'
+import { openAITextToAudio } from '../../../../utility/openAITextToAudio';
 import 'dotenv/config';
 import leven from 'leven';
 
@@ -50,17 +51,21 @@ export const POST = async (req: Request): Promise<Response> => {
     const response = await fetch(`https://api.nytimes.com/svc/topstories/v2/${closestSection}.json?api-key=${NYTAPIKEY}`);
     const data = await response.json();
 
-    const articles = data.results.map((article: any, index: number) => ({
-      index: index + 1,
-      title: article.title,
-      abstract: article.abstract,
-      byline: article.byline,
-      url: article.url
+    const articles = await Promise.all(data.results.map(async (article: any, index: number) => {
+      const audioBase64 = await openAITextToAudio(`Article Number ${index}, ${article.title} by ${article.byline}. ${article.abstract}`);
+      return {
+        index: index,
+        title: article.title,
+        abstract: article.abstract,
+        byline: article.byline,
+        audio: audioBase64,
+        url: article.url
+      };
     }));
 
-    const textsForVoice = articles.map((article: Article) => `${article.index}. ${article.title} by ${article.byline}. ${article.abstract}`);
-    console.log(textsForVoice);
-    return new Response(JSON.stringify({ textsForVoice, articles }), {
+    // const textsForVoice = articles.map((article: Article) => `${article.index}. ${article.title} by ${article.byline}. ${article.abstract}`);
+    // console.log(textsForVoice);
+    return new Response(JSON.stringify(articles), {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {

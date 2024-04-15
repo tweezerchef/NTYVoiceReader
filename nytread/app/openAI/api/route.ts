@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { openAIAudioToText } from '../../../../utility/openAIAudioToText';
+import { openAIAudioToText } from '../../../utility/openAIAudioToText';
 
 export const POST = async (req: Request) => {
     // Parse the JSON body from the request

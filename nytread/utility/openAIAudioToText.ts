@@ -1,4 +1,4 @@
-'use server';
+
 import fs from "fs";
 import OpenAI from "openai";
 
