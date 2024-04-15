@@ -1,35 +1,40 @@
 "use client";
 import dynamic from "next/dynamic";
 import { useState } from "react";
-import { ReactMediaRecorderProps } from "react-media-recorder";
-//import { ReactMediaRecorder } from "react-media-recorder";
-interface RecordAudioProps extends ReactMediaRecorderProps {
+
+interface RecordAudioProps {
   isRecording: boolean;
   setIsRecording: (isRecording: boolean) => void;
+  direction?: "section" | "article";
 }
 
-const ReactMediaRecorder = dynamic<RecordAudioProps>(
-  () => import("react-media-recorder").then((mod) => mod.ReactMediaRecorder), // Explicitly access the component
+// Import ReactMediaRecorder dynamically without extending its props here
+const ReactMediaRecorder = dynamic(
+  () => import("react-media-recorder").then((mod) => mod.ReactMediaRecorder),
   { ssr: false }
 );
 
-export const RecordAudio = () => {
+export const RecordAudio = ({
+  isRecording,
+  setIsRecording,
+}: RecordAudioProps) => {
   const [recording, setRecording] = useState<string>("");
   const [transcription, setTranscription] = useState<string>("");
-  const [isRecording, setIsRecording] = useState<boolean>(false);
+  const [startRecording, setStartRecording] = useState<(() => void) | null>(
+    null
+  );
+  const [stopRecording, setStopRecording] = useState<(() => void) | null>(null);
 
   const handleStopRecording = async (blobUrl: string, blob: Blob) => {
     setRecording(blobUrl);
 
-    // Convert the blob to a base64 string
     const reader = new FileReader();
     reader.readAsDataURL(blob);
     reader.onloadend = async () => {
       const base64data = reader.result as string;
 
-      // Send the base64 audio data to the API
       try {
-        const response = await fetch("/openAI/api/", {
+        const response = await fetch("/openAI/api/category/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -60,9 +65,7 @@ export const RecordAudio = () => {
           <>
             <p>Status: {status}</p>
             <button
-              className={`px-4 py-2 rounded ${
-                isRecording ? "bg-red-500" : "bg-blue-500"
-              } text-white`}
+              className={`px-4 py-2 rounded ${isRecording ? "bg-red-500" : "bg-blue-500"} text-white`}
               onClick={() => {
                 if (isRecording) {
                   stopRecording();
