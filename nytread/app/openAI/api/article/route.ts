@@ -30,7 +30,6 @@ async function getClosestArticleIndex(transcription: string): Promise<number> {
   return closestMatchIndex;
 }
 
-const NYTAPIKEY = process.env.NYT_API_KEY
 
 export const POST = async (req: Request): Promise<Response> => {
 
