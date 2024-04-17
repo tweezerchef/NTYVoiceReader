@@ -1,30 +1,35 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useArticleData } from "../contexts/ArticleContext";
 // import { RecordAudioSection } from "./components/RecordAudioSection";
 
-export default function Section() {
+export default function Article() {
   const { article } = useArticleData();
   const [isRecording, setIsRecording] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   // Convert Base64 audio data to blob URLs
-  const audioUrl = URL.createObjectURL(
-    new Blob([Buffer.from(article.audio, "base64")], { type: "audio/mp3" })
-  );
+  const audioURL = useMemo(() => {
+    if (article.audio) {
+      return URL.createObjectURL(
+        new Blob([Buffer.from(article.audio, "base64")], { type: "audio/mp3" })
+      );
+    }
+  }, [article.audio]);
 
   // Change the source and play the next audio when index changes
   useEffect(() => {
     const audioElem = audioRef.current;
-    if (audioElem && article.audio) {
-      audioElem.src = article.audio;
+    if (audioElem && audioURL) {
+      audioElem.src = audioURL;
+      audioElem.load();
       if (!isRecording) {
         audioElem
           .play()
           .catch((err) => console.error("Error playing audio:", err));
       }
     }
-  }, [article.audio, isRecording]);
+  }, [audioURL, isRecording]);
 
   // // Change the source and play the next audio when index changes
   // useEffect(() => {
