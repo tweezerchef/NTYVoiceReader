@@ -1,6 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useState, useEffect, FC } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSectionData } from "../../contexts/SectionContext";
 

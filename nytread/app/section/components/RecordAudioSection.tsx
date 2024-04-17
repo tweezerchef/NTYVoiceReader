@@ -1,6 +1,8 @@
 "use client";
 import dynamic from "next/dynamic";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useArticleData } from "../../contexts/ArticleContext";
 interface Article {
   index: number;
   title: string;
@@ -29,7 +31,8 @@ export const RecordAudioSection = ({
 }: RecordAudioProps) => {
   const [recording, setRecording] = useState<string>("");
   const [transcription, setTranscription] = useState<string>("");
-
+  const { setArticle } = useArticleData();
+  const router = useRouter();
   const handleStopRecording = async (blobUrl: string, blob: Blob) => {
     setRecording(blobUrl);
 
@@ -52,7 +55,8 @@ export const RecordAudioSection = ({
         }
 
         const data = await response.json();
-        setTranscription(data.transcription);
+        setArticle(data);
+        router.push("/article");
       } catch (error) {
         console.error("Error sending audio to server:", error);
       }

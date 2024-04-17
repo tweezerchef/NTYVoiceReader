@@ -2,12 +2,15 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
 interface Article {
-  recording: string;
+  audio: string;
 }
+interface ArticleContextType {
+  article: Article;
+  setArticle: (article: Article) => void;
+}
+const ArticleContext = createContext<ArticleContextType | undefined>(undefined);
 
-const ArticleContext = createContext<Article | undefined>(undefined);
-
-const useArticleData = () => {
+export const useArticleData = () => {
   const context = useContext(ArticleContext);
   if (context === undefined) {
     throw new Error("useArticleData must be used within a ArticleProvider");
@@ -17,9 +20,9 @@ const useArticleData = () => {
 export const ArticleProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [recording, setRecording] = useState<string>("");
+  const [article, setArticle] = useState<Article>({ audio: "" });
   return (
-    <ArticleContext.Provider value={{ recording }}>
+    <ArticleContext.Provider value={{ article, setArticle }}>
       {children}
     </ArticleContext.Provider>
   );
