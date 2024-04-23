@@ -5,7 +5,6 @@ import { openAITextToAudio } from '../../../../utility/openAITextToAudio';
 import 'dotenv/config';
 import leven from 'leven';
 import { nyTimesArticleParser } from '../../../../utility/articleScraper';
-import { text2Speech, Text2SpeechParams } from '../../../../utility/text2Speech'
 import { NextApiResponse } from 'next';
 
 interface Article {
@@ -84,10 +83,14 @@ export const POST = async (req: Request, res: NextApiResponse): Promise<any> => 
     // return new Response(JSON.stringify({ audio: articleAudio }), {
     //   headers: { 'Content-Type': 'application/json' }
     // });
-    await text2Speech({
-      res: res,
-      input: articleText
-  });
+    // const audioBuffer = await text2Speech({ input: articleText });
+
+    // return new Response(audioBuffer, {
+    //   headers: { 'Content-Type': 'audio/mpeg' }
+    // });
+    return new Response(JSON.stringify({ articleText }), {
+      headers: { 'Content-Type': 'application/json' }
+    });
   } catch (error) {
     console.error('Error in POST handler:', error);
     return new Response(JSON.stringify({ error: 'An error occurred' }), {
