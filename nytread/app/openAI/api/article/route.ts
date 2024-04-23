@@ -5,6 +5,8 @@ import { openAITextToAudio } from '../../../../utility/openAITextToAudio';
 import 'dotenv/config';
 import leven from 'leven';
 import { nyTimesArticleParser } from '../../../../utility/articleScraper';
+import { text2Speech, Text2SpeechParams } from '../../../../utility/text2Speech'
+import { NextApiResponse } from 'next';
 
 interface Article {
   index: number;
@@ -12,6 +14,26 @@ interface Article {
   abstract: string;
   byline: string;
   url: string;
+}
+interface OnErrorParams {
+  error: Error;
+}
+interface OnSuccessParams {
+  model: string;
+  buffer: Buffer;
+}
+enum Text2SpeechVoiceEnum {
+  alloy = 'alloy',
+  // add other enum values as needed
+}
+interface Text2SpeechParams {
+  res: NextApiResponse;
+  onSuccess: (params: OnSuccessParams) => void;
+  onError: (params: OnErrorParams) => void;
+  model?: string;
+  voice?: Text2SpeechVoiceEnum;
+  input: string;
+  speed?: number;
 }
 
 const selections = ['home', 'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
@@ -31,7 +53,7 @@ async function getClosestArticleIndex(transcription: string): Promise<number> {
 }
 
 
-export const POST = async (req: Request): Promise<Response> => {
+export const POST = async (req: Request, res: NextApiResponse): Promise<any> => {
 
 
   try {
@@ -57,10 +79,15 @@ export const POST = async (req: Request): Promise<Response> => {
     console.log(selectedArticleURL);
 
     const articleText = await nyTimesArticleParser(selectedArticleURL);
-    const articleAudio = await openAITextToAudio(articleText);
-    return new Response(JSON.stringify({ audio: articleAudio }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
+
+    // const articleAudio = await openAITextToAudio(articleText);
+    // return new Response(JSON.stringify({ audio: articleAudio }), {
+    //   headers: { 'Content-Type': 'application/json' }
+    // });
+    await text2Speech({
+      res: res,
+      input: articleText
+  });
   } catch (error) {
     console.error('Error in POST handler:', error);
     return new Response(JSON.stringify({ error: 'An error occurred' }), {

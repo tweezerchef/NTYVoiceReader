@@ -55,8 +55,8 @@ export const RecordAudioSection = ({
         }
 
         const data = await response.json();
-        await setArticle(data);
-        router.push("/article");
+        // await setArticle(data);
+        // router.push("/article");
       } catch (error) {
         console.error("Error sending audio to server:", error);
       }
