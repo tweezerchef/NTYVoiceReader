@@ -17,7 +17,6 @@ export default function Article() {
     }
   }, [article.audio]);
 
-  // Change the source and play the next audio when index changes
   useEffect(() => {
     const audioElem = audioRef.current;
     if (audioElem && audioURL) {
@@ -31,16 +30,6 @@ export default function Article() {
     }
   }, [audioURL, isRecording]);
 
-  // // Change the source and play the next audio when index changes
-  // useEffect(() => {
-  //   if (!audioRef.current) return;
-  //   if (audioUrls && audioUrls[currentAudioIndex]) {
-  //     audioRef.current.src = audioUrls[currentAudioIndex];
-  //     audioRef.current
-  //       .play()
-  //       .catch((err) => console.error("Error playing audio:", err));
-  //   }
-  // }, [currentAudioIndex, audioUrls]);
   useEffect(() => {
     if (isRecording && audioRef.current) {
       audioRef.current.pause();
