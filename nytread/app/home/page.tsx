@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 const RecordAudio = dynamic(
   () => import("./components/RecordAudio").then((mod) => mod.RecordAudio),
   {
-    ssr: false, // Disable server-side rendering
+    ssr: false,
   }
 );
 export default function HomePage() {

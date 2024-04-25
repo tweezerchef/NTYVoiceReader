@@ -2,7 +2,7 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
 interface Article {
-  article: { articleText: string };
+  articleText: string;
 }
 interface ArticleContextType {
   article: Article;
@@ -20,9 +20,7 @@ export const useArticleData = () => {
 export const ArticleProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [article, setArticle] = useState<Article>({
-    article: { articleText: "" },
-  });
+  const [article, setArticle] = useState<Article>({ articleText: "" });
   return (
     <ArticleContext.Provider value={{ article, setArticle }}>
       {children}
