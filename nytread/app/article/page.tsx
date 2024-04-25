@@ -15,8 +15,13 @@ export default function Article() {
   useEffect(() => {
     if (article && typeof article.articleText === "string") {
       const chunkSize = 1000; // Define chunk size for splitting the text
-      const regex = new RegExp(`.{1,${chunkSize}}`, "g");
-      const textChunks = article.articleText.match(regex) || [];
+      // Regex to split by spaces ensuring each chunk is as close to 1000 characters as possible without exceeding it
+      const regex = new RegExp(`\\b.{1,${chunkSize}}\\b(\\s|$)`, "g");
+      const textChunks = [];
+      let match;
+      while ((match = regex.exec(article.articleText)) !== null) {
+        textChunks.push(match[0]);
+      }
       setChunks(textChunks);
     }
   }, [article]);
