@@ -31,3 +31,16 @@ body {
     text-wrap: balance;
   }
 }
+@layer utilities {
+  @keyframes clickDown {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(0.95);
+    }
+  }
+  .animate-click {
+    animation: clickDown 0.2s ease-in-out forwards;
+  }
+}

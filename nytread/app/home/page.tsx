@@ -13,13 +13,16 @@ export default function HomePage() {
   const [audioUrl, setAudioUrl] = useState<string>("/NYTOpening.mp3");
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [initialLoad, setInitialLoad] = useState<boolean>(true);
+  const [isClicked, setIsClicked] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const toggleRecording = useCallback(() => {
+    setIsClicked(true);
     if (!isRecording) {
       audioRef.current?.pause();
     }
     setIsRecording(!isRecording);
+    setTimeout(() => setIsClicked(false), 200);
   }, [isRecording]);
 
   useEffect(() => {
@@ -51,14 +54,21 @@ export default function HomePage() {
   }, [isRecording, initialLoad]);
 
   return (
-    <main className="bg-slate-500">
+    <main>
       <div className="bg-slate-500 h-screen w-screen">
         <button
-          className="w-svw h-svh focus:outline-none"
+          className="w-48 h-48 focus:outline-none"
           onClick={toggleRecording}
         >
-          <Image src="/bigButton.png" alt="Record" fill={true} />
-          {/* <img src="/bigButton.png" alt="Record" /> */}
+          <div className="aspect-w-1 aspect-h-1 w-full h-full">
+            <Image
+              src="/bigButton.png"
+              alt="Record"
+              fill={true}
+              objectFit="contain"
+              className={`w-full h-full ${isClicked ? "animate-click" : ""}`}
+            />
+          </div>
           <audio ref={audioRef} src={audioUrl} autoPlay hidden />
           <RecordAudio
             isRecording={isRecording}

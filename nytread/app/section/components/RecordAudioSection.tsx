@@ -14,11 +14,9 @@ interface Article {
 interface RecordAudioProps {
   isRecording: boolean;
   setIsRecording: (isRecording: boolean) => void;
-  direction?: "section" | "article";
   articles: Article[];
 }
 
-// Import ReactMediaRecorder dynamically without extending its props here
 const ReactMediaRecorder = dynamic(
   () => import("react-media-recorder").then((mod) => mod.ReactMediaRecorder),
   { ssr: false }
@@ -30,7 +28,6 @@ export const RecordAudioSection = ({
   articles,
 }: RecordAudioProps) => {
   const [recording, setRecording] = useState<string>("");
-  const [transcription, setTranscription] = useState<string>("");
   const { setArticle } = useArticleData();
   const router = useRouter();
 
@@ -90,13 +87,6 @@ export const RecordAudioSection = ({
             </button>
 
             {recording && <audio src={recording} controls />}
-
-            <div className="mt-4">
-              <h2 className="text-lg font-bold mb-2">Transcription:</h2>
-              <pre className="p-4 bg-gray-200 text-black rounded">
-                {transcription}
-              </pre>
-            </div>
           </>
         )}
       />
