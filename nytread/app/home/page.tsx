@@ -11,9 +11,13 @@ const RecordAudio = dynamic(
 export default function HomePage() {
   const [audioUrl, setAudioUrl] = useState<string>("/NYTOpening.mp3");
   const [isRecording, setIsRecording] = useState<boolean>(false);
+  const [initialLoad, setInitialLoad] = useState<boolean>(true);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const toggleRecording = useCallback(() => {
+    if (!isRecording) {
+      audioRef.current?.pause();
+    }
     setIsRecording(!isRecording);
   }, [isRecording]);
 
@@ -33,25 +37,28 @@ export default function HomePage() {
 
   useEffect(() => {
     const playAudio = async () => {
-      if (audioRef.current) {
+      if (!isRecording && initialLoad && audioRef.current) {
         try {
           await audioRef.current.play();
+          setInitialLoad(false); // Prevent future playback
         } catch (error) {
           console.error("Error playing audio:", error);
         }
       }
     };
     playAudio();
-  }, [audioRef]);
+  }, [isRecording, initialLoad]);
 
   return (
     <main className="bg-slate-500">
       <div className="bg-slate-500 h-screen w-screen">
-        <button className="w-svw h-svh focus:outline-none">
+        <button
+          className="w-svw h-svh focus:outline-none"
+          onClick={toggleRecording}
+        >
           <img src="/bigButton.png" alt="Record" />
-          <audio ref={audioRef} src={audioUrl} autoPlay />
+          <audio ref={audioRef} src={audioUrl} autoPlay hidden />
           <RecordAudio
-            direction="section"
             isRecording={isRecording}
             setIsRecording={setIsRecording}
           />
