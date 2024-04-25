@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 
 const RecordAudio = dynamic(
   () => import("./components/RecordAudio").then((mod) => mod.RecordAudio),
@@ -56,7 +57,8 @@ export default function HomePage() {
           className="w-svw h-svh focus:outline-none"
           onClick={toggleRecording}
         >
-          <img src="/bigButton.png" alt="Record" />
+          <Image src="/bigButton.png" alt="Record" fill={true} />
+          {/* <img src="/bigButton.png" alt="Record" /> */}
           <audio ref={audioRef} src={audioUrl} autoPlay hidden />
           <RecordAudio
             isRecording={isRecording}
