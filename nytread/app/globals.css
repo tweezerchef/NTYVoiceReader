@@ -26,21 +26,12 @@ body {
     rgb(var(--background-start-rgb));
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+@keyframes click-animation {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
 }
-@layer utilities {
-  @keyframes clickDown {
-    0%, 100% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(0.95);
-    }
-  }
-  .animate-click {
-    animation: clickDown 0.2s ease-in-out forwards;
-  }
+
+.animate-click {
+  animation: click-animation 200ms ease-out forwards;
 }

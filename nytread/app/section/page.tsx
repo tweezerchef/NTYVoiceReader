@@ -69,7 +69,7 @@ export default function Section() {
       >
         <div className="aspect-w-1 aspect-h-1 w-full h-full">
           <Image
-            src="/bigButton.png"
+            src="/BigButton.svg"
             alt="Record"
             fill={true}
             objectFit="contain"

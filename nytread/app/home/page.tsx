@@ -62,11 +62,11 @@ export default function HomePage() {
         >
           <div className="aspect-w-1 aspect-h-1 w-full h-full">
             <Image
-              src="/bigButton.png"
+              src="/BigButton.svg"
               alt="Record"
               fill={true}
               objectFit="contain"
-              className={`w-full h-full ${isClicked ? "animate-click" : ""}`}
+              // className={`w-full h-full ${isClicked ? "animate-click" : ""}`}
             />
           </div>
           <audio ref={audioRef} src={audioUrl} autoPlay hidden />
