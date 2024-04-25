@@ -1,6 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useArticleData } from "../../contexts/ArticleContext";
 interface Article {
@@ -31,6 +31,11 @@ export const RecordAudioSection = ({
   const { setArticle } = useArticleData();
   const router = useRouter();
 
+  const recordingControl = useRef({
+    startRecording: () => {},
+    stopRecording: () => {},
+  });
+
   const handleStopRecording = async (blobUrl: string, blob: Blob) => {
     setRecording(blobUrl);
 
@@ -53,7 +58,6 @@ export const RecordAudioSection = ({
         }
 
         const data = await response.json();
-        console.log(data);
         await setArticle(data);
         router.push("/article");
       } catch (error) {
@@ -61,35 +65,25 @@ export const RecordAudioSection = ({
       }
     };
   };
+  useEffect(() => {
+    if (isRecording) {
+      recordingControl.current.startRecording();
+    } else {
+      recordingControl.current.stopRecording();
+    }
+  }, [isRecording]);
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Audio Recorder</h1>
+    <ReactMediaRecorder
+      audio
+      onStop={handleStopRecording}
+      render={({ status, startRecording, stopRecording }) => {
+        // Bind the recording control functions to the ref object
+        recordingControl.current.startRecording = startRecording;
+        recordingControl.current.stopRecording = stopRecording;
 
-      <ReactMediaRecorder
-        audio
-        onStop={handleStopRecording}
-        render={({ status, startRecording, stopRecording }) => (
-          <>
-            <p>Status: {status}</p>
-            <button
-              className={`px-4 py-2 rounded ${isRecording ? "bg-red-500" : "bg-blue-500"} text-white`}
-              onClick={() => {
-                if (isRecording) {
-                  stopRecording();
-                } else {
-                  startRecording();
-                }
-                setIsRecording(!isRecording); // Toggle recording state based on action
-              }}
-            >
-              {isRecording ? "Stop Recording" : "Start Recording"}
-            </button>
-
-            {recording && <audio src={recording} controls />}
-          </>
-        )}
-      />
-    </div>
+        return null;
+      }}
+    />
   );
 };

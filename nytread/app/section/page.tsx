@@ -8,6 +8,8 @@ export default function Section() {
   const { articles } = useSectionData();
   const [currentAudioIndex, setCurrentAudioIndex] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
+  const [shouldPlayAfterRecording, setShouldPlayAfterRecording] =
+    useState(true);
   const [isClicked, setIsClicked] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -19,7 +21,9 @@ export default function Section() {
   );
   const toggleRecording = useCallback(() => {
     setIsClicked(true);
-    if (!isRecording) {
+    if (isRecording) {
+      setShouldPlayAfterRecording(false);
+    } else {
       audioRef.current?.pause();
     }
     setIsRecording(!isRecording);
@@ -37,31 +41,25 @@ export default function Section() {
       }
     };
 
+    // Event listener for when the audio finishes playing
     audioElem.addEventListener("ended", handleAudioEnd);
+
+    // Check to play audio only when it's not recording and when the index changes
+    if (
+      !isRecording &&
+      shouldPlayAfterRecording &&
+      audioUrls[currentAudioIndex]
+    ) {
+      audioElem.src = audioUrls[currentAudioIndex];
+      audioElem
+        .play()
+        .catch((err) => console.error("Error playing audio:", err));
+    }
 
     return () => {
       audioElem.removeEventListener("ended", handleAudioEnd);
     };
-  }, [currentAudioIndex, audioUrls.length]);
-
-  // Change the source and play the next audio when index changes
-  useEffect(() => {
-    const audioElem = audioRef.current;
-    if (audioElem && audioUrls[currentAudioIndex]) {
-      audioElem.src = audioUrls[currentAudioIndex];
-      if (!isRecording) {
-        audioElem
-          .play()
-          .catch((err) => console.error("Error playing audio:", err));
-      }
-    }
-  }, [currentAudioIndex, audioUrls, isRecording]);
-
-  useEffect(() => {
-    if (isRecording && audioRef.current) {
-      audioRef.current.pause();
-    }
-  }, [isRecording]);
+  }, [currentAudioIndex, audioUrls, isRecording, shouldPlayAfterRecording]);
 
   return (
     <div className="bg-slate-500 h-screen w-screen">

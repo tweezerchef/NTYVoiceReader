@@ -66,10 +66,9 @@ export const RecordAudio = ({
       audio
       onStop={handleStopRecording}
       render={({ startRecording, stopRecording }) => {
-        // Assign recording control functions to the ref object
         recordingControl.current.startRecording = startRecording;
         recordingControl.current.stopRecording = stopRecording;
-        return null; // Render nothing
+        return null;
       }}
     />
   );
