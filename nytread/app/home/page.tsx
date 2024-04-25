@@ -45,15 +45,17 @@ export default function HomePage() {
   }, [audioRef]);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24 bg-slate-500">
-      <div className="flex flex-col items-center justify-center">
-        <h1 className="text-4xl font-bold text-white mb-4">NYT Read</h1>
-        <audio ref={audioRef} src={audioUrl} controls autoPlay />
-        <RecordAudio
-          direction="section"
-          isRecording={isRecording}
-          setIsRecording={setIsRecording}
-        />
+    <main className="bg-slate-500">
+      <div className="bg-slate-500 h-screen w-screen">
+        <button className="w-svw h-svh focus:outline-none">
+          <img src="/bigButton.png" alt="Record" />
+          <audio ref={audioRef} src={audioUrl} autoPlay />
+          <RecordAudio
+            direction="section"
+            isRecording={isRecording}
+            setIsRecording={setIsRecording}
+          />
+        </button>
       </div>
     </main>
   );
