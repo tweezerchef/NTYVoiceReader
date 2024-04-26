@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import Lottie from "react-lottie-player";
 import openerLoading from "../../public/opener-loading.json";
 

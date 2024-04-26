@@ -15,6 +15,7 @@ interface RecordAudioProps {
   isRecording: boolean;
   setIsRecording: (isRecording: boolean) => void;
   articles: Article[];
+  setIsPlaying: (isPlaying: boolean) => void;
 }
 
 const ReactMediaRecorder = dynamic(
@@ -26,6 +27,7 @@ export const RecordAudioSection = ({
   isRecording,
   setIsRecording,
   articles,
+  setIsPlaying,
 }: RecordAudioProps) => {
   const [recording, setRecording] = useState<string>("");
   const { setArticle } = useArticleData();
@@ -37,6 +39,7 @@ export const RecordAudioSection = ({
   });
 
   const handleStopRecording = async (blobUrl: string, blob: Blob) => {
+    setIsPlaying(true);
     setRecording(blobUrl);
 
     const reader = new FileReader();

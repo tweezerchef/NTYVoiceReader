@@ -2,6 +2,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useArticleData } from "../contexts/ArticleContext";
 import { openAITextToAudio } from "./openAITextToAudio";
+import Lottie from "react-lottie-player";
+import openerLoading from "../../public/opener-loading.json";
 
 export default function Article() {
   const { article } = useArticleData();
@@ -10,6 +12,7 @@ export default function Article() {
   const [chunks, setChunks] = useState<string[]>([]);
   const [audioUrls, setAudioUrls] = useState<string[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [animation, setAnimation] = useState(true);
 
   // Split text into chunks
   useEffect(() => {
@@ -49,11 +52,18 @@ export default function Article() {
     if (audioUrls.length > currentChunkIndex && audioElem) {
       if (!audioElem.src || audioElem.src !== audioUrls[currentChunkIndex]) {
         audioElem.src = audioUrls[currentChunkIndex];
-        audioElem.play().catch(console.error);
+        audioElem
+          .play()
+          .then(() => {
+            setIsPlaying(true);
+            setAnimation(false);
+          })
+          .catch(console.error);
       }
 
       const handleAudioEnd = () => {
         setIsPlaying(false);
+        setAnimation(false);
         setCurrentChunkIndex((prevIndex) => prevIndex + 1);
       };
 
@@ -75,11 +85,18 @@ export default function Article() {
   }, [audioUrls, currentChunkIndex, isPlaying]);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-slate-500">
-      <h1 className="text-4xl font-bold text-white mb-4">
-        NYT Reader: Articles Audio
-      </h1>
-      <audio ref={audioRef} controls />
+    <main>
+      <div className="bg-slate-500 h-screen w-screen">
+        <div className="aspect-w-1 aspect-h-1 w-full h-full">
+          <Lottie
+            animationData={openerLoading}
+            play={animation}
+            style={{ width: "90vw", height: "90vh" }}
+            loop={true}
+          />
+        </div>
+        <audio ref={audioRef} hidden />
+      </div>
     </main>
   );
 }

@@ -2,7 +2,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSectionData } from "../contexts/SectionContext";
 import { RecordAudioSection } from "./components/RecordAudioSection";
-import Image from "next/image";
+import Lottie from "react-lottie-player";
+import openerLoading from "../../public/opener-loading.json";
 
 export default function Section() {
   const { articles } = useSectionData();
@@ -11,6 +12,7 @@ export default function Section() {
   const [shouldPlayAfterRecording, setShouldPlayAfterRecording] =
     useState(true);
   const [isClicked, setIsClicked] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   // Convert Base64 audio data to blob URLs
@@ -62,18 +64,14 @@ export default function Section() {
   }, [currentAudioIndex, audioUrls, isRecording, shouldPlayAfterRecording]);
 
   return (
-    <div className="bg-slate-500 h-screen w-screen">
-      <button
-        className="w-48 h-48 focus:outline-none"
-        onClick={toggleRecording}
-      >
+    <main>
+      <div className="bg-slate-500 h-screen w-screen" onClick={toggleRecording}>
         <div className="aspect-w-1 aspect-h-1 w-full h-full">
-          <Image
-            src="/BigButton.svg"
-            alt="Record"
-            fill={true}
-            objectFit="contain"
-            className={`w-full h-full ${isClicked ? "animate-click" : ""}`}
+          <Lottie
+            animationData={openerLoading}
+            play={isPlaying}
+            style={{ width: "90vw", height: "90vh" }}
+            loop={true}
           />
         </div>
         <audio ref={audioRef} autoPlay hidden />
@@ -81,8 +79,9 @@ export default function Section() {
           articles={articles}
           isRecording={isRecording}
           setIsRecording={setIsRecording}
+          setIsPlaying={setIsPlaying}
         />
-      </button>
-    </div>
+      </div>
+    </main>
   );
 }
