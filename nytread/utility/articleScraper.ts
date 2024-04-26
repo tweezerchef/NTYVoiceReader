@@ -1,64 +1,58 @@
-import got from "got";
-import { CookieJar } from 'tough-cookie';
-import jsdom from "jsdom";
-const { JSDOM } = jsdom;
+import puppeteer, { Browser, Page } from 'puppeteer';
+import { JSDOM } from 'jsdom';
 import 'dotenv/config';
+import { setTimeout } from 'node:timers/promises';
 
 const username = process.env.NYT_USERNAME;
 const password = process.env.NYT_PASSWORD;
 
 if (typeof username !== 'string' || typeof password !== 'string') {
-  throw new Error("NYT_USERNAME and NYT_PASSWORD must be set in the environment.");
+    throw new Error("Environment variables NYT_USERNAME and NYT_PASSWORD must be set.");
 }
 
-// Function to log in and get cookies
-const loginToNYTimes = async (username: string, password: string) => {
-  const cookieJar = new CookieJar(); // Create a new cookie jar
-  try {
-    await got.post('https://myaccount.nytimes.com/auth/login', {
-      form: {
-        username: 'ltomblock@gmail.com',
-        password,
-      },
-      cookieJar: cookieJar,
-      followRedirect: true,
-    });
-    return cookieJar; // Return the cookie jar with the login cookies
-  } catch (error) {
-    console.error('Login failed:', error);
-    throw error;
-  }
-};
-
-// Main function to fetch article text
 export const nyTimesArticleParser = async (url: string): Promise<string> => {
-  try {
-    const cookieJar = await loginToNYTimes(username, password); // Perform login
+    let browser: Browser | null = null;
+    try {
+      browser = await puppeteer.launch({ headless: false }); // For debugging
+      const page: Page = await browser.newPage();
 
-    const response = await got(url, { cookieJar: cookieJar });
-    const dom = new JSDOM(response.body);
-    const document = dom.window.document;
+      // Go to the login page
+      await page.goto('https://myaccount.nytimes.com/auth/login', { waitUntil: 'networkidle2' });
 
-    // Fetch all paragraph elements
-    const paragraphs = Array.from(document.querySelectorAll("p"));
-    let articleText = "";
+      // Enter the email and go to the next step
+      await page.waitForSelector('input[name="email"]', { visible: true });
+      await page.type('input[name="email"]', username);
+      await page.click('button[type="submit"]');
 
-    const excludeStrings = [
-      "Advertisement", "Supported by",
-      "Send any friend a story",
-      "As a subscriber, you have 10 gift articles to give each month. Anyone can read what you share.",
-    ];
+      // Now wait for the password field to appear
+      await page.waitForSelector('input[name="password"]', { visible: true });
+      await page.type('input[name="password"]', password);
+      await page.click('button[type="submit"]');
+      await page.waitForNavigation({ waitUntil: 'networkidle0' });
 
-    paragraphs.forEach((p) => {
-      const text = p.textContent?.trim();
-      if (text && !excludeStrings.some(exclude => text.startsWith(exclude)) && !text.startsWith("By")) {
-        articleText += text + " ";
-      }
-    });
+      // Go to the article URL
+      console.log('Going to the article URL:', url);
+      await page.goto(url, { waitUntil: 'networkidle0' });
 
-    return articleText || "Text not found";
-  } catch (err) {
-    console.error('Error fetching article:', err);
-    throw err;
-  }
+        const bodyHTML = await page.evaluate(() => document.documentElement.outerHTML);
+        const dom = new JSDOM(bodyHTML);
+        const document = dom.window.document;
+
+        let articleText = "";
+        document.querySelectorAll("p").forEach(p => {
+            const text = p.textContent?.trim();
+            if (text && !text.startsWith("Advertisement") && !text.startsWith("Supported by")) {
+                articleText += text + " ";
+            }
+        });
+
+        return articleText || "Text not found";
+    } catch (err) {
+        console.error('Error while fetching the article:', err);
+        throw err;
+    } finally {
+        if (browser) {
+            await browser.close();
+        }
+    }
 };
