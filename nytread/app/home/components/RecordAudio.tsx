@@ -7,6 +7,7 @@ import { useSectionData } from "../../contexts/SectionContext";
 interface RecordAudioProps {
   isRecording: boolean;
   setIsRecording: (isRecording: boolean) => void;
+  setIsPlaying: (isPlaying: boolean) => void;
 }
 
 const ReactMediaRecorder = dynamic(
@@ -17,6 +18,7 @@ const ReactMediaRecorder = dynamic(
 export const RecordAudio = ({
   isRecording,
   setIsRecording,
+  setIsPlaying,
 }: RecordAudioProps) => {
   const { setArticles } = useSectionData();
   const router = useRouter();
@@ -34,6 +36,7 @@ export const RecordAudio = ({
   }, [isRecording]);
 
   const handleStopRecording = async (blobUrl: string, blob: Blob) => {
+    setIsPlaying(true);
     const reader = new FileReader();
     reader.readAsDataURL(blob);
     reader.onloadend = async () => {
