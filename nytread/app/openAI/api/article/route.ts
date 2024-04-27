@@ -4,7 +4,7 @@ import { openAIAudioToText } from '../../../../utility/openAIAudioToText'
 import { openAITextToAudio } from '../../../../utility/openAITextToAudio';
 import 'dotenv/config';
 import leven from 'leven';
-import { nyTimesArticleParser } from '../../../../utility/articleScraper';
+import { nyTimesArticleParser } from '../../../../utility/articleScraperblah';
 import { NextApiResponse } from 'next';
 
 interface Article {

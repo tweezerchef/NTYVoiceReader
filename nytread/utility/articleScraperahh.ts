@@ -20,9 +20,9 @@ export const nyTimesArticleParser = async (url: string): Promise<string> => {
         const page: Page = await browser.newPage();
         const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36';
         await page.setUserAgent(userAgent);
-        console.log(process.cwd())
+
         // Read cookies from the file
-        const cookiesString = await fs.readFile('nytimesCookie.json', { encoding: 'utf8' });
+        const cookiesString = await fs.readFile('nytimes_cookie.json', { encoding: 'utf8' });
         const cookies = JSON.parse(cookiesString);
 
         // Set cookies in the page
@@ -73,18 +73,10 @@ export const nyTimesArticleParser = async (url: string): Promise<string> => {
         const document = dom.window.document;
 
         let articleText = "";
-        let isArticleEndReached = false; // Flag to track if the end of the article is reached
         document.querySelectorAll("p").forEach(p => {
             const text = p.textContent?.trim();
             if (text && !text.startsWith("Advertisement") && !text.startsWith("Supported by")) {
-                if (!isArticleEndReached) {
-                    // Append text to articleText until the marker is found
-                    articleText += text + " ";
-                    // Check if the marker is found to indicate the end of the article
-                    if (text.startsWith("The Times is committed to publishing a diversity of letters to the editor.")) {
-                        isArticleEndReached = true;
-                    }
-                }
+                articleText += text + " ";
             }
         });
 
