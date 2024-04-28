@@ -1,11 +1,9 @@
-import fs from 'fs';
-import path from 'path';
-import { openAIAudioToText } from '../../../../utility/openAIAudioToText'
-import { openAITextToAudio } from '../../../../utility/openAITextToAudio';
-import 'dotenv/config';
-import leven from 'leven';
-import { nyTimesArticleParser } from '../../../../utility/articleScraperblah';
-import { NextApiResponse } from 'next';
+import fs from "fs";
+import path from "path";
+import { openAIAudioToText } from "../../../../utility/openAIAudioToText";
+import leven from "leven";
+import { nyTimesArticleParser } from "../../../../utility/articleScraperblah";
+import { NextApiResponse } from "next";
 
 interface Article {
   index: number;
@@ -22,7 +20,7 @@ interface OnSuccessParams {
   buffer: Buffer;
 }
 enum Text2SpeechVoiceEnum {
-  alloy = 'alloy',
+  alloy = "alloy",
   // add other enum values as needed
 }
 interface Text2SpeechParams {
@@ -35,7 +33,22 @@ interface Text2SpeechParams {
   speed?: number;
 }
 
-const selections = ['home', 'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+const selections = [
+  "home",
+  "zero",
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+  "ten",
+  "eleven",
+  "twelve",
+];
 
 async function getClosestArticleIndex(transcription: string): Promise<number> {
   let closestMatchIndex = -1;
@@ -51,16 +64,19 @@ async function getClosestArticleIndex(transcription: string): Promise<number> {
   return closestMatchIndex;
 }
 
-
-export const POST = async (req: Request, res: NextApiResponse): Promise<any> => {
-
-
+export const POST = async (
+  req: Request,
+  res: NextApiResponse
+): Promise<any> => {
   try {
     const body = await req.json();
     const audioBase64 = body.audioBase64;
-    const buffer = Buffer.from(audioBase64.split(';base64,').pop() || '', 'base64');
+    const buffer = Buffer.from(
+      audioBase64.split(";base64,").pop() || "",
+      "base64"
+    );
 
-    const tempFilePath = path.join('/tmp', `audio-${Date.now()}.mp3`);
+    const tempFilePath = path.join("/tmp", `audio-${Date.now()}.mp3`);
     fs.writeFileSync(tempFilePath, buffer);
 
     const transcription = await openAIAudioToText(tempFilePath);
@@ -68,34 +84,27 @@ export const POST = async (req: Request, res: NextApiResponse): Promise<any> => 
 
     const articleIndex = await getClosestArticleIndex(transcription);
     if (articleIndex === -1) {
-      return new Response(JSON.stringify({ error: 'No matching article found' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({ error: "No matching article found" }),
+        {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
     const articles: Article[] = body.articles;
     const selectedArticleURL = articles[articleIndex].url;
     console.log(selectedArticleURL);
 
     const articleText = await nyTimesArticleParser(selectedArticleURL);
-
-    // const articleAudio = await openAITextToAudio(articleText);
-    // return new Response(JSON.stringify({ audio: articleAudio }), {
-    //   headers: { 'Content-Type': 'application/json' }
-    // });
-    // const audioBuffer = await text2Speech({ input: articleText });
-
-    // return new Response(audioBuffer, {
-    //   headers: { 'Content-Type': 'audio/mpeg' }
-    // });
     return new Response(JSON.stringify({ articleText }), {
-      headers: { 'Content-Type': 'application/json' }
+      headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error('Error in POST handler:', error);
-    return new Response(JSON.stringify({ error: 'An error occurred' }), {
+    console.error("Error in POST handler:", error);
+    return new Response(JSON.stringify({ error: "An error occurred" }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { "Content-Type": "application/json" },
     });
   }
 };
