@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Lottie from "react-lottie-player";
 import openerLoading from "../public/opener-loading.json";
-import recordingAnimation from "../public/record-ltcopyr.json";
+import recordingAnimation from "../public/record-ltcopyrmod1.json";
 import { useReactMediaRecorder } from "react-media-recorder";
 
 export default function LoginPage() {
