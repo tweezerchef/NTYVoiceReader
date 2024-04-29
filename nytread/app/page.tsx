@@ -1,26 +1,36 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Lottie from "react-lottie-player";
 import openerLoading from "../public/opener-loading.json";
 import { useReactMediaRecorder } from "react-media-recorder";
 
 export default function LoginPage() {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string>("/login.mp3");
+  const [animate, setAnimate] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [initialLoad, setInitialLoad] = useState<boolean>(true);
   const router = useRouter();
+  const audioRef = useRef<HTMLAudioElement>(null);
+
   const handleClick = () => {
     // Toggle recording state
     if (!isRecording) {
+      audioRef.current?.pause();
+      setAudioUrl("/startRecording.mp3");
+      audioRef.current?.play();
       startRecording();
       setIsRecording(true);
     } else {
       stopRecording();
+      setAudioUrl("/recordingEnded.mp3");
+      audioRef.current?.play();
     }
   };
 
   const handleAudioBlob = async (blob: Blob) => {
     setIsRecording(false); // Reset recording state
+    setAnimate(true);
     const reader = new FileReader();
     reader.onload = async () => {
       const base64data = reader.result as string;
@@ -31,7 +41,7 @@ export default function LoginPage() {
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include", // Necessary for cookies to be set if the API is on a different origin
+          credentials: "include",
           body: JSON.stringify({ audioBase64: base64data }),
         });
 
@@ -41,7 +51,6 @@ export default function LoginPage() {
         const data = await response.json();
         console.log(data, "data");
         if (data.isValid) {
-          // Change this line
           router.push("/home");
         }
       } catch (error) {
@@ -53,12 +62,25 @@ export default function LoginPage() {
 
   const { status, startRecording, stopRecording, mediaBlobUrl } =
     useReactMediaRecorder({
-      video: false, // Set to false if only audio is needed
+      video: false,
       onStop: (blobUrl, blob) => {
-        // You can handle API call here after recording stops
         handleAudioBlob(blob);
       },
     });
+
+  useEffect(() => {
+    const playAudio = async () => {
+      if (!isRecording && initialLoad && audioRef.current) {
+        try {
+          await audioRef.current.play();
+          setInitialLoad(false);
+        } catch (error) {
+          console.error("Error playing audio:", error);
+        }
+      }
+    };
+    playAudio();
+  }, [isRecording, initialLoad]);
 
   return (
     <main>
@@ -66,12 +88,12 @@ export default function LoginPage() {
         <div className="aspect-w-1 aspect-h-1 w-full h-full">
           <Lottie
             animationData={openerLoading}
-            play={isPlaying}
+            play={animate}
             style={{ width: "90vw", height: "90vh" }}
             loop={true}
           />
+          <audio ref={audioRef} src={audioUrl} autoPlay hidden />
         </div>
-        <p>{status}</p>
       </div>
     </main>
   );
