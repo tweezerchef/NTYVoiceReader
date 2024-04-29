@@ -29,12 +29,13 @@ export default function HomePage() {
     setIsRecording(!isRecording);
   }, [isRecording]);
 
-  // useEffect(() => {
-  //   if (!cookies.token) {
-  //     // Redirect to login if no token is found
-  //     router.replace("/login");
-  //   }
-  // }, [cookies.token, router]);
+  useEffect(() => {
+    console.log("Token from cookies:", cookies.token);
+    if (!cookies.token) {
+      console.log("No token found, redirecting to login");
+      router.replace("/");
+    }
+  }, [cookies.token, router]);
 
   useEffect(() => {
     const playAudio = async () => {

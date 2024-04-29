@@ -39,7 +39,7 @@ export const POST = async (req: Request) => {
     headers.append("Content-Type", "application/json");
     headers.append(
       "Set-Cookie",
-      `token=${token}; HttpOnly; Secure; SameSite=Strict; Path=/;`
+      `token=${token}; SameSite=Strict; Path=/;`
     );
 
     return new Response(JSON.stringify({ isValid }), { headers });

@@ -31,6 +31,7 @@ export default function LoginPage() {
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include", // Necessary for cookies to be set if the API is on a different origin
           body: JSON.stringify({ audioBase64: base64data }),
         });
 
