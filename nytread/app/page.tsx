@@ -3,13 +3,13 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Lottie from "react-lottie-player";
 import openerLoading from "../public/opener-loading.json";
+import recordingAnimation from "../public/record-ltcopyr.json";
 import { useReactMediaRecorder } from "react-media-recorder";
 
 export default function LoginPage() {
   const [audioUrl, setAudioUrl] = useState<string>("/login.mp3");
   const [animate, setAnimate] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [initialLoad, setInitialLoad] = useState<boolean>(true);
   const [loginSuccessful, setLoginSuccessful] = useState(false);
   const router = useRouter();
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -22,10 +22,12 @@ export default function LoginPage() {
       audioRef.current?.play();
       startRecording();
       setIsRecording(true);
+      setAnimate(true);
     } else {
       stopRecording();
       setAudioUrl("/recordingEnded.mp3");
       audioRef.current?.play();
+      setAnimate(false);
     }
   };
 
@@ -70,19 +72,6 @@ export default function LoginPage() {
       },
     });
 
-  // useEffect(() => {
-  //   const playAudio = async () => {
-  //     if (!isRecording && initialLoad && audioRef.current) {
-  //       try {
-  //         await audioRef.current.play();
-  //         setInitialLoad(false);
-  //       } catch (error) {
-  //         console.error("Error playing audio:", error);
-  //       }
-  //     }
-  //   };
-  //   playAudio();
-  // }, [isRecording, initialLoad]);
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.addEventListener("ended", () => {
@@ -108,7 +97,7 @@ export default function LoginPage() {
       <div className="bg-slate-500 h-screen w-screen" onClick={handleClick}>
         <div className="aspect-w-1 aspect-h-1 w-full h-full">
           <Lottie
-            animationData={openerLoading}
+            animationData={isRecording ? recordingAnimation : openerLoading}
             play={animate}
             style={{ width: "90vw", height: "90vh" }}
             loop={true}
