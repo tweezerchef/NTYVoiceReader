@@ -1,5 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { useCookies } from "react-cookie";
 import dynamic from "next/dynamic";
 import Lottie from "react-lottie-player";
 import openerLoading from "../../public/opener-loading.json";
@@ -17,6 +19,8 @@ export default function HomePage() {
   const [initialLoad, setInitialLoad] = useState<boolean>(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const router = useRouter();
+  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
 
   const toggleRecording = useCallback(() => {
     if (!isRecording) {
@@ -24,6 +28,13 @@ export default function HomePage() {
     }
     setIsRecording(!isRecording);
   }, [isRecording]);
+
+  // useEffect(() => {
+  //   if (!cookies.token) {
+  //     // Redirect to login if no token is found
+  //     router.replace("/login");
+  //   }
+  // }, [cookies.token, router]);
 
   useEffect(() => {
     const playAudio = async () => {
