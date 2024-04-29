@@ -19,7 +19,9 @@ As of 1/25/2024, this app works but needs some improvements.
   - Need to implement voice and visual error messages and be able to fix them (Right now, if you say something that isn't recognized, it will still return the article based on what the options are and its proximity to the recording)
   - Need visual and audio feedback for when the app is listening
   - Have audio "instructions" optional; say "instructions" to hear them
+  - Make sure there is a timeout for the app listening
 - Back End
+  - Clean up fs promises stuff in routes.
   - DB for storing user data (Prisma/Postgres)
   - Need to implement a way to store user article data (bookmarks?)
   - Need to implement a way to store user preferences

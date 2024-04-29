@@ -3,16 +3,60 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Lottie from "react-lottie-player";
 import openerLoading from "../public/opener-loading.json";
+import { useReactMediaRecorder } from "react-media-recorder";
 
-export default function Page() {
+export default function LoginPage() {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const router = useRouter();
   const handleClick = () => {
-    setIsPlaying(true);
-    setTimeout(() => {
-      router.push("/home");
-    }, 3000);
+    // Toggle recording state
+    if (!isRecording) {
+      startRecording();
+      setIsRecording(true);
+    } else {
+      stopRecording();
+    }
   };
+
+  const handleAudioBlob = async (blob: Blob) => {
+    setIsRecording(false); // Reset recording state
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64data = reader.result as string;
+
+      try {
+        const response = await fetch("/api/login/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ audioBase64: base64data }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.isValid) {
+          // Change this line
+          router.push("/home");
+        }
+      } catch (error) {
+        console.error("Error processing audio:", error);
+      }
+    };
+    reader.readAsDataURL(blob);
+  };
+
+  const { status, startRecording, stopRecording, mediaBlobUrl } =
+    useReactMediaRecorder({
+      video: false, // Set to false if only audio is needed
+      onStop: (blobUrl, blob) => {
+        // You can handle API call here after recording stops
+        handleAudioBlob(blob);
+      },
+    });
 
   return (
     <main>
@@ -25,6 +69,7 @@ export default function Page() {
             loop={true}
           />
         </div>
+        <p>{status}</p>
       </div>
     </main>
   );
