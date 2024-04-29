@@ -1,14 +1,27 @@
-# In progress New York Times Reader for the visually impaired
+# NTYVoiceReader
 
-## You will need 2 API keys to run this project
+Work In Progress: A simple voice reader for the New York Times.
 
-1. [New York Times API](https://developer.nytimes.com/)
-2. [OpenAI API](https://beta.openai.com/signup/)
-Once you have these keys, you can add them to the env.txt file and then change that file name to .env
+## Summary
 
-## To run this project, cd into the nytread directory and run the following commands
+As of 1/25/2024, this app works but needs some improvements.
 
-```bash
-npm install
-npm run dev
-```
+### Known Issues / Improvements
+
+- There is a placeholder for where the login page should be. It will include the following:
+  - Voice Registration
+  - Voice Login
+  - Opening Voice Instructions
+  - Use the word-list library to ensure credential is word and recorded correctly
+- UI/Navigation needs to be improved
+  - voice "loading" message
+  - Need to implement voice commands for alternate navigation (Right now, you can find the article and have it read to you, but you can't go back to the main menu without using the back button)
+  - Need to implement voice and visual error messages and be able to fix them (Right now, if you say something that isn't recognized, it will still return the article based on what the options are and its proximity to the recording)
+  - Need visual and audio feedback for when the app is listening
+  - Have audio "instructions" optional; say "instructions" to hear them
+  - Make sure there is a timeout for the app listening
+- Back End
+  - Clean up fs promises stuff in routes.
+  - DB for storing user data (Prisma/Postgres)
+  - Need to implement a way to store user article data (bookmarks?)
+  - Need to implement a way to store user preferences
