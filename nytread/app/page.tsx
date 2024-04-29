@@ -10,6 +10,7 @@ export default function LoginPage() {
   const [animate, setAnimate] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [initialLoad, setInitialLoad] = useState<boolean>(true);
+  const [loginSuccessful, setLoginSuccessful] = useState(false);
   const router = useRouter();
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -51,10 +52,11 @@ export default function LoginPage() {
         const data = await response.json();
         console.log(data, "data");
         if (data.isValid) {
-          router.push("/home");
+          setLoginSuccessful(data.isValid);
         }
       } catch (error) {
         console.error("Error processing audio:", error);
+        setLoginSuccessful(false);
       }
     };
     reader.readAsDataURL(blob);
@@ -68,19 +70,38 @@ export default function LoginPage() {
       },
     });
 
+  // useEffect(() => {
+  //   const playAudio = async () => {
+  //     if (!isRecording && initialLoad && audioRef.current) {
+  //       try {
+  //         await audioRef.current.play();
+  //         setInitialLoad(false);
+  //       } catch (error) {
+  //         console.error("Error playing audio:", error);
+  //       }
+  //     }
+  //   };
+  //   playAudio();
+  // }, [isRecording, initialLoad]);
   useEffect(() => {
-    const playAudio = async () => {
-      if (!isRecording && initialLoad && audioRef.current) {
-        try {
-          await audioRef.current.play();
-          setInitialLoad(false);
-        } catch (error) {
-          console.error("Error playing audio:", error);
+    if (audioRef.current) {
+      audioRef.current.addEventListener("ended", () => {
+        if (loginSuccessful) {
+          router.push("/home");
         }
+      });
+    }
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.removeEventListener("ended", () => {
+          if (loginSuccessful) {
+            router.push("/home");
+          }
+        });
       }
     };
-    playAudio();
-  }, [isRecording, initialLoad]);
+  }, [loginSuccessful, router]);
 
   return (
     <main>
