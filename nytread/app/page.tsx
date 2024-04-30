@@ -18,8 +18,6 @@ export default function LoginPage() {
     // Toggle recording state
     if (!isRecording) {
       audioRef.current?.pause();
-      setAudioUrl("/startRecording.mp3");
-      audioRef.current?.play();
       startRecording();
       setIsRecording(true);
       setAnimate(true);
@@ -32,7 +30,7 @@ export default function LoginPage() {
   };
 
   const handleAudioBlob = async (blob: Blob) => {
-    setIsRecording(false); // Reset recording state
+    setIsRecording(false);
     setAnimate(true);
     const reader = new FileReader();
     reader.onload = async () => {

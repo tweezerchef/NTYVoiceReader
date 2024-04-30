@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { openAIAudioToText } from "../../../../utility/openAIAudioToText";
 import leven from "leven";
-import { nyTimesArticleParser } from "../../../../utility/articleScraperblah";
+import { nyTimesArticleParser } from "../../../../utility/articleScraperahh";
 import { NextApiResponse } from "next";
 
 interface Article {

@@ -22,7 +22,7 @@ export const nyTimesArticleParser = async (url: string): Promise<string> => {
         await page.setUserAgent(userAgent);
 
         // Read cookies from the file
-        const cookiesString = await fs.readFile('nytimes_cookie.json', { encoding: 'utf8' });
+        const cookiesString = await fs.readFile('nytimesCookie.json', { encoding: 'utf8' });
         const cookies = JSON.parse(cookiesString);
 
         // Set cookies in the page

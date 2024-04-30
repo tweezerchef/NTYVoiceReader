@@ -29,11 +29,13 @@ export const RecordAudio = ({
 
   useEffect(() => {
     if (isRecording) {
+      setIsPlaying(true);
       recordingControl.current.startRecording();
     } else {
       recordingControl.current.stopRecording();
+      setIsRecording(false);
     }
-  }, [isRecording]);
+  }, [isRecording, setIsPlaying, setIsRecording]);
 
   const handleStopRecording = async (blobUrl: string, blob: Blob) => {
     setIsPlaying(true);

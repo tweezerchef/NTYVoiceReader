@@ -4,6 +4,8 @@ import { openAIAudioToText } from '../../../../utility/openAIAudioToText'
 import { openAITextToAudio } from '../../../../utility/openAITextToAudio';
 import 'dotenv/config';
 import leven from 'leven';
+import NodeCache from 'node-cache';
+const cache = new NodeCache({ stdTTL: 28800 });
 
 interface Article {
   index: number;
@@ -48,23 +50,40 @@ export const POST = async (req: Request): Promise<Response> => {
     const closestSection = getClosestSection(transcription);
     console.log(closestSection);
 
-    const response = await fetch(`https://api.nytimes.com/svc/topstories/v2/${closestSection}.json?api-key=${NYTAPIKEY}`);
-    const data = await response.json();
+    // const response = await fetch(`https://api.nytimes.com/svc/topstories/v2/${closestSection}.json?api-key=${NYTAPIKEY}`);
+    // const data = await response.json();
 
-    const articles = await Promise.all(data.results.map(async (article: any, index: number) => {
-      const audioBase64 = await openAITextToAudio(`Article Number ${index}, ${article.title} by ${article.byline}. ${article.abstract}`);
-      return {
-        index: index,
-        title: article.title,
-        abstract: article.abstract,
-        byline: article.byline,
-        audio: audioBase64,
-        url: article.url
-      };
-    }));
+    // const articles = await Promise.all(data.results.map(async (article: any, index: number) => {
+    //   const audioBase64 = await openAITextToAudio(`Article Number ${index}, ${article.title} by ${article.byline}. ${article.abstract}`);
+    //   return {
+    //     index: index,
+    //     title: article.title,
+    //     abstract: article.abstract,
+    //     byline: article.byline,
+    //     audio: audioBase64,
+    //     url: article.url
+    //   };
+    // }));
+    let articles = cache.get<Article[]>(closestSection);
+    if (!articles) {
+      const response = await fetch(`https://api.nytimes.com/svc/topstories/v2/${closestSection}.json?api-key=${NYTAPIKEY}`);
+      const data = await response.json();
 
-    // const textsForVoice = articles.map((article: Article) => `${article.index}. ${article.title} by ${article.byline}. ${article.abstract}`);
-    // console.log(textsForVoice);
+      articles = await Promise.all(data.results.map(async (article: any, index: number) => {
+        const audioBase64 = await openAITextToAudio(`Article Number ${index}, ${article.title} by ${article.byline}. ${article.abstract}`);
+        return {
+          index: index,
+          title: article.title,
+          abstract: article.abstract,
+          byline: article.byline,
+          audio: audioBase64,
+          url: article.url
+        };
+      }));
+
+      cache.set(closestSection, articles);
+    }
+
     return new Response(JSON.stringify(articles), {
       headers: { 'Content-Type': 'application/json' }
     });
