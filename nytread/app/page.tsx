@@ -1,10 +1,13 @@
 "use client";
+import dynamic from "next/dynamic";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Lottie from "react-lottie-player";
+
 import openerLoading from "../public/opener-loading.json";
 import recordingAnimation from "../public/record-ltcopyrmod1.json";
 import { useReactMediaRecorder } from "react-media-recorder";
+
+const Lottie = dynamic(() => import("react-lottie-player"), { ssr: false });
 
 export default function LoginPage() {
   const [audioUrl, setAudioUrl] = useState<string>("/login.mp3");
