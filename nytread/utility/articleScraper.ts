@@ -68,13 +68,12 @@ export const nyTimesArticleParser = async (url: string): Promise<string> => {
         });
 
         // Extract article text
-        const bodyHTML = await page.evaluate(() => document.documentElement.outerHTML);
+        const bodyHTML: string = await page.evaluate(() => document.documentElement.outerHTML);
         const dom = new JSDOM(bodyHTML);
-        const document = dom.window.document;
-
+        const document: Document = dom.window.document;
         let articleText = "";
         let isArticleEndReached = false; // Flag to track if the end of the article is reached
-        document.querySelectorAll("p").forEach(p => {
+        document.querySelectorAll("p").forEach((p: HTMLElement )=> {
             const text = p.textContent?.trim();
             if (text && !text.startsWith("Advertisement") && !text.startsWith("Supported by")) {
                 if (!isArticleEndReached) {
