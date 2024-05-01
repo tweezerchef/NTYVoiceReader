@@ -6,9 +6,9 @@ import fs from 'fs/promises';
 const username = process.env.NYT_USERNAME;
 const password = process.env.NYT_PASSWORD;
 
-if (typeof username !== 'string' || typeof password !== 'string') {
-    throw new Error("Environment variables NYT_USERNAME and NYT_PASSWORD must be set.");
-}
+// if (typeof username !== 'string' || typeof password !== 'string') {
+//     throw new Error("Environment variables NYT_USERNAME and NYT_PASSWORD must be set.");
+// }
 
 export const nyTimesArticleParser = async (url: string): Promise<string> => {
     let browser: Browser | null = null;
