@@ -1,10 +1,21 @@
 # NTYVoiceReader
 
 Work In Progress: A simple voice reader for the New York Times.
+Right now the app works but is not for commercial use. It is a proof of concept.  I am having issues some issue with authentication issues with the New York Times website.  A temporary fix I have implemented in the use of my personal NYT API Cookie, which is not ideal.  I am working on a fix for this issue, and the app will be updated when it is resolved, you can try to use it, but I am now blocked because the NYTimes thinks I am using my login for nefarious purposes.  If you want to use your own login credentials simple replace the cookie in the "nytimesCookie.json" with your own.  There are several dev tools that can help you get your cookie the one I use is called "EditThisCookie" for Chrome.
+The only other requirement is to have your own Open API key.  Once you have it place it in the env.txt file and rename it to .env.  The app will not work without it.
+Other then that open a terminal in the /nytreader directory and run the following commands:
+
+```bash
+npm install
+npm run dev
+```
+
+Then when prompted to log on simply click the mouse anywhere on the page and say "New York" then click again to stop the recording
+All the navigation is done in the same manner, click to start recording, click to end.
 
 ## Summary
 
-As of 1/25/2024, this app works but needs some improvements.
+As of 5/01/2024, this app works but needs some improvements.
 
 ### Known Issues / Improvements
 
