@@ -5,9 +5,14 @@ import { useRouter } from "next/navigation";
 
 import openerLoading from "../public/opener-loading.json";
 import recordingAnimation from "../public/record-ltcopyrmod1.json";
-import { useReactMediaRecorder } from "react-media-recorder";
 
 const Lottie = dynamic(() => import("react-lottie-player"), { ssr: false });
+const RecordAudio = dynamic(
+  () => import("./components/AudioRecorder").then((mod) => mod.AudioRecorder),
+  {
+    ssr: false,
+  }
+);
 
 export default function LoginPage() {
   const [audioUrl, setAudioUrl] = useState<string>("/login.mp3");
@@ -21,11 +26,10 @@ export default function LoginPage() {
     // Toggle recording state
     if (!isRecording) {
       audioRef.current?.pause();
-      startRecording();
       setIsRecording(true);
       setAnimate(true);
     } else {
-      stopRecording();
+      setIsRecording(false);
       setAudioUrl("/recordingEnded.mp3");
       audioRef.current?.play();
       setAnimate(false);
@@ -65,13 +69,13 @@ export default function LoginPage() {
     reader.readAsDataURL(blob);
   };
 
-  const { status, startRecording, stopRecording, mediaBlobUrl } =
-    useReactMediaRecorder({
-      video: false,
-      onStop: (blobUrl, blob) => {
-        handleAudioBlob(blob);
-      },
-    });
+  // const { status, startRecording, stopRecording, mediaBlobUrl } =
+  //   useReactMediaRecorder({
+  //     video: false,
+  //     onStop: (blobUrl, blob) => {
+  //       handleAudioBlob(blob);
+  //     },
+  //   });
 
   useEffect(() => {
     if (audioRef.current) {
@@ -102,6 +106,11 @@ export default function LoginPage() {
             play={animate}
             style={{ width: "90vw", height: "90vh" }}
             loop={true}
+          />
+          <RecordAudio
+            onBlobReady={handleAudioBlob}
+            isRecording={isRecording}
+            setIsRecording={setIsRecording}
           />
           <audio ref={audioRef} src={audioUrl} autoPlay hidden />
         </div>

@@ -20,6 +20,7 @@ As of 1/25/2024, this app works but needs some improvements.
   - Need visual and audio feedback for when the app is listening
   - Have audio "instructions" optional; say "instructions" to hear them
   - Make sure there is a timeout for the app listening
+  - Figure out a way for the app to "listen" to the user for commands without having to press a button
 - Back End
   - Clean up fs promises stuff in routes.
   - DB for storing user data (Prisma/Postgres)
