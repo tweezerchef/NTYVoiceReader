@@ -35,6 +35,7 @@ As of 5/01/2024, this app works but needs some improvements.
   - Make sure there is a timeout for the app listening
   - Figure out a way for the app to "listen" to the user for commands without having to press a button
 - Back End
+  - Check Cache, implement for articles as well.
   - Change article logic to speed up the process
   - Clean up fs promises stuff in routes.
   - DB for storing user data (Prisma/Postgres)
