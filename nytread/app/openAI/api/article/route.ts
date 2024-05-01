@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { openAIAudioToText } from "../../../../utility/openAIAudioToText";
 import leven from "leven";
-import { nyTimesArticleParser } from "../../../../utility/articleScraper";
+import { nyTimesArticleParser } from "../../../../utility/articleScraperNoAuth";
 import { NextApiResponse } from "next";
 
 interface Article {
@@ -94,7 +94,7 @@ export const POST = async (
     }
     const articles: Article[] = body.articles;
     const selectedArticleURL = articles[articleIndex].url;
-    console.log(selectedArticleURL);
+
 
     const articleText = await nyTimesArticleParser(selectedArticleURL);
     return new Response(JSON.stringify({ articleText }), {
